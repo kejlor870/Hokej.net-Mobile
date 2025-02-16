@@ -1,29 +1,40 @@
 package com.example.hokejnetmobile;
 
 public class Article {
-    private String author, title, timestamp;
-    private int imageResId;
+    private String title;
+    private String author;
+    private String content;
+    private String imageUrl;
 
-    public Article(String author, String title, String timestamp, int imageResId) {
-        this.author = author;
+//    private String timestamp;
+
+    public Article(String title, String author, String content, String imageUrl) {
         this.title = title;
-        this.timestamp = timestamp;
-        this.imageResId = imageResId;
-    }
-
-    public String getAuthor() {
-        return author;
+        this.author = author;
+        this.content = content;
+        this.imageUrl = imageUrl;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public String getAuthor() {
+        return author;
     }
 
-    public int getImageResId() {
-        return imageResId;
+    public String getContent() {
+        return content;
     }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+//    public String getTimestamp() {
+//        return timestamp; // Assuming you have a timestamp field
+//    }
+
+
 }
+
