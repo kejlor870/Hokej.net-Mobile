@@ -43,6 +43,17 @@
                 android:textSize="12sp"
                 android:textColor="@color/gray"
                 />
+
+            <ImageButton
+                android:id="@+id/btnSaveArticle"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:src="@drawable/bookmark"
+                android:scaleType="fitCenter"
+                android:contentDescription="Bookmark Article"
+                android:layout_marginTop="10dp"/>
+
         </LinearLayout>
 
         <!-- Article Image -->
@@ -52,5 +63,7 @@
             android:layout_height="80dp"
             android:scaleType="centerCrop"/>
     </LinearLayout>
+
+
 
 </androidx.cardview.widget.CardView>

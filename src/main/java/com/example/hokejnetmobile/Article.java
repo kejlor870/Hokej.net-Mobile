@@ -6,8 +6,6 @@ public class Article {
     private String content;
     private String imageUrl;
 
-//    private String timestamp;
-
     public Article(String title, String author, String content, String imageUrl) {
         this.title = title;
         this.author = author;
@@ -30,11 +28,5 @@ public class Article {
     public String getImageUrl() {
         return imageUrl;
     }
-
-//    public String getTimestamp() {
-//        return timestamp; // Assuming you have a timestamp field
-//    }
-
-
 }
 

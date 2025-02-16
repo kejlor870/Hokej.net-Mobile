@@ -1,5 +1,6 @@
 package com.example.hokejnetmobile;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -37,10 +38,16 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
         Article article = articleList.get(position);
         holder.titleText.setText(article.getTitle());
         holder.authorText.setText(article.getAuthor());
-//        holder.timestampText.setText(article.getTimestamp());
 
-        // Load Image (Glide or Picasso recommended)
-        Glide.with(context).load(article.getImageUrl()).into(holder.articleImage);
+        // Load image using Glide
+        if (article.getImageUrl() != null && !article.getImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(article.getImageUrl())
+                    .error(R.drawable.error_image)
+                    .into(holder.articleImage);
+        } else {
+            holder.articleImage.setImageResource(R.drawable.error_image);
+        }
 
         // Handle click event
         holder.itemView.setOnClickListener(v -> {
@@ -49,7 +56,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
             intent.putExtra("article_author", article.getAuthor());
             intent.putExtra("article_content", article.getContent());
             intent.putExtra("article_image", article.getImageUrl());
-            context.startActivity(intent);
+            ((Activity) context).startActivityForResult(intent, 1); // Use startActivityForResult
         });
     }
 
@@ -71,4 +78,3 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
         }
     }
 }
-

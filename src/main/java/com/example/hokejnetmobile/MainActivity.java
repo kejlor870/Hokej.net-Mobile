@@ -1,5 +1,6 @@
 package com.example.hokejnetmobile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -57,14 +58,14 @@ public class MainActivity extends AppCompatActivity {
 
                 if (id == R.id.nav_bookmark) {
                     // Handle bookmark navigation
-                    List<Article> articles2 = new ArrayList<>();
-                    articles2.add(new Article("Liza Donnelly", "Barbara Shermund, Observer of Us", "Mar 11 • 3 min read", "https://hokej.net/storage/galerie/7065/ce263a6255358357bbdcee13caf75fe0.JPG"));
-                    articles2.add(new Article("Hannes Grauweihler", "Portugal And I Are Very Much In Love", "May 26 • 7 min read", "https://hokej.net/storage/galerie/7065/ffa13833d7305627e74ce34e6d6e78fa.JPG"));
+                    // Selected BOOKMARK
+                    startActivity(new Intent(MainActivity.this, SavedArticlesActivity.class));
 
-                    articleAdapter = new ArticleAdapter(MainActivity.this, articles2);
-                    recyclerView.setAdapter(articleAdapter);
+
                 } else if (id == R.id.nav_home) {
                     // Handle settings navigation
+                    // Selected HOME
+
                     articleAdapter = new ArticleAdapter(MainActivity.this, articleList);
                     recyclerView.setAdapter(articleAdapter);
                 } else if (id == R.id.nav_profile) {
