@@ -29,7 +29,7 @@ public class FullArticleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_article);
 
-        // Setup Toolbar with back navigation
+        // Setup Toolbar z nawigacją wstecz
         Toolbar toolbarFullArticle = findViewById(R.id.toolbarFullArticle);
         setSupportActionBar(toolbarFullArticle);
         if (getSupportActionBar() != null) {
@@ -37,34 +37,41 @@ public class FullArticleActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(null);
         }
 
-        // Initialize UI components
+        // Inicjalizacja komponentów UI
         titleText = findViewById(R.id.fullTitleText);
         authorText = findViewById(R.id.fullAuthorText);
         contentText = findViewById(R.id.fullContentText);
         articleImage = findViewById(R.id.fullArticleImage);
         bookmarkButton = findViewById(R.id.bookmarkButton);
 
-        // Get data from Intent
+        // Pobranie danych z Intent
         Intent intent = getIntent();
         articleTitle = intent.getStringExtra("article_title");
         articleAuthor = intent.getStringExtra("article_author");
         articleContent = intent.getStringExtra("article_content");
         articleImageUrl = intent.getStringExtra("article_image");
 
-        // Set data to views
+        // Ustawienie danych w widokach
         titleText.setText(articleTitle);
         authorText.setText("By " + articleAuthor);
-        contentText.setText(articleContent);
+//        contentText.setText(articleContent);
+
+        String moreContent = "";
+        for(int i=0; i<10; i++){
+            moreContent += articleContent + " ";
+        }
+        contentText.setText(moreContent);
+
         Glide.with(this).load(articleImageUrl).into(articleImage);
 
-        // SharedPreferences for saving articles
+        // SharedPreferences do zapisywania artykułów
         sharedPreferences = getSharedPreferences("SavedArticles", Context.MODE_PRIVATE);
-        isSaved = sharedPreferences.contains(articleTitle); // Check if article is saved
+        isSaved = sharedPreferences.contains(articleTitle); // Sprawdzenie, czy artykuł jest zapisany
 
-        // Set initial bookmark icon
+        // Ustawienie początkowej ikony zakładki
         updateBookmarkIcon();
 
-        // Handle bookmark button click
+        // Obsługa kliknięcia przycisku zakładki
         bookmarkButton.setOnClickListener(v -> toggleBookmark());
     }
 
@@ -72,18 +79,18 @@ public class FullArticleActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         if (isSaved) {
-            editor.remove(articleTitle); // Remove article from saved
+            editor.remove(articleTitle); // Usunięcie artykułu z zapisanych
             isSaved = false;
 
-            // Notify SavedArticlesActivity that an article was removed
+            // Powiadomienie SavedArticlesActivity o usunięciu artykułu
             Intent resultIntent = new Intent();
             resultIntent.putExtra("removed_article_title", articleTitle);
-            setResult(RESULT_OK, resultIntent); // Ensure this is called
+            setResult(RESULT_OK, resultIntent);
             Log.d("FullArticleActivity", "Article removed: " + articleTitle);
         } else {
-            // Save article title, content, and image URL as a JSON string
-            String articleData = "{\"title\":\"" + articleTitle + "\",\"content\":\"" + articleContent + "\",\"imageUrl\":\"" + articleImageUrl + "\"}";
-            editor.putString(articleTitle, articleData); // Save article data
+            // Zapisanie danych artykułu jako string JSON
+            String articleData = "{\"title\":\"" + articleTitle + "\",\"author\":\"" + articleAuthor + "\",\"content\":\"" + articleContent + "\",\"imageUrl\":\"" + articleImageUrl + "\"}";
+            editor.putString(articleTitle, articleData);
             isSaved = true;
         }
         editor.apply();
@@ -92,15 +99,15 @@ public class FullArticleActivity extends AppCompatActivity {
 
     private void updateBookmarkIcon() {
         if (isSaved) {
-            bookmarkButton.setImageResource(R.drawable.saved_bookmark); // Use filled bookmark
+            bookmarkButton.setImageResource(R.drawable.saved_bookmark); // Wypełniona ikona zakładki
         } else {
-            bookmarkButton.setImageResource(R.drawable.bookmark); // Use outlined bookmark
+            bookmarkButton.setImageResource(R.drawable.bookmark); // Pusta ikona zakładki
         }
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        finish(); // Close activity and go back
+        finish(); // Zamknięcie aktywności i powrót
         return true;
     }
 }

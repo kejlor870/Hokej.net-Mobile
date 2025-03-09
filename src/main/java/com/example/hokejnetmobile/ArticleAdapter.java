@@ -16,7 +16,6 @@ import java.util.List;
 
 import com.bumptech.glide.Glide;
 
-
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleViewHolder> {
     private List<Article> articleList;
     private Context context;
@@ -37,7 +36,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
     public void onBindViewHolder(@NonNull ArticleViewHolder holder, int position) {
         Article article = articleList.get(position);
         holder.titleText.setText(article.getTitle());
-        holder.authorText.setText(article.getAuthor());
+        // Zabezpieczenie przed null - wyświetla "Brak autora", jeśli author jest null
+        holder.authorText.setText(article.getAuthor() != null ? article.getAuthor() : "Brak autora");
 
         // Load image using Glide
         if (article.getImageUrl() != null && !article.getImageUrl().isEmpty()) {

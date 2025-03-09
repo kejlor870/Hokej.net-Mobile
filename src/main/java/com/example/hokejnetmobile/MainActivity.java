@@ -11,12 +11,16 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import android.os.Handler;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,20 +61,12 @@ public class MainActivity extends AppCompatActivity {
                 int id = item.getItemId();
 
                 if (id == R.id.nav_bookmark) {
-                    // Handle bookmark navigation
-                    // Selected BOOKMARK
                     startActivity(new Intent(MainActivity.this, SavedArticlesActivity.class));
-
-
                 } else if (id == R.id.nav_home) {
-                    // Handle settings navigation
-                    // Selected HOME
-
                     articleAdapter = new ArticleAdapter(MainActivity.this, articleList);
                     recyclerView.setAdapter(articleAdapter);
                 } else if (id == R.id.nav_profile) {
-                    // Handle settings navigation
-                    Toast.makeText(MainActivity.this, "Kliknieto profil", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Kliknięto profil", Toast.LENGTH_SHORT).show();
                 }
 
                 return true;
@@ -79,20 +75,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Detect scroll to hide/show bottom navigation
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            private boolean isBottomNavVisible = true; // To track visibility of bottom nav
-            private int lastScrollY = 0; // Track last scroll position
+            private boolean isBottomNavVisible = true;
+            private int lastScrollY = 0;
 
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                // If scrolling down and bottom nav is visible, hide it
                 if (dy > 0 && isBottomNavVisible) {
                     bottomNavigationView.animate().translationY(bottomNavigationView.getHeight()).setDuration(300);
                     isBottomNavVisible = false;
-                }
-                // If scrolling up and bottom nav is hidden, show it
-                else if (dy < 0 && !isBottomNavVisible) {
+                } else if (dy < 0 && !isBottomNavVisible) {
                     bottomNavigationView.animate().translationY(0).setDuration(300);
                     isBottomNavVisible = true;
                 }
@@ -101,21 +94,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadArticles() {
-        // Simulate fetching articles (replace with real API call)
-        articleList.clear();
-        articleList.add(new Article("Portugal And I Are Very Much In Love", "Hannes Grauweihler", "Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum is simply dummy text of the printing and typesetting industry.", "https://unia-oswiecim.pl/wp-content/uploads/2024/09/002.jpg"));
-        articleList.add(new Article("Barbara Shermund, Observer of Us", "Liza Donnelly", "Mar 11 • 3 min read", "https://hokej.net/storage/galerie/7065/ffa13833d7305627e74ce34e6d6e78fa.JPG"));
-        articleList.add(new Article("Portugal And I Are Very Much In Love", "Hannes Grauweihler", "May 26 • 7 min read", "https://hokej.net/storage/galerie/7065/ce263a6255358357bbdcee13caf75fe0.JPG"));
-        // Add more articles as needed
-        articleAdapter.notifyDataSetChanged();
+        Retrofit retrofit = RetrofitClient.getRetrofitInstance();
+        NewsApiService newsApiService = retrofit.create(NewsApiService.class);
+
+        // Twój klucz API z NewsAPI
+        String apiKey = "3433561f3408493d8c2f3f881260778c";
+        // Słowa kluczowe dla hokeja
+        String query = "hockey OR NHL";
+
+        Call<NewsResponse> call = newsApiService.getHockeyArticles(query, apiKey);
+        call.enqueue(new Callback<NewsResponse>() {
+            @Override
+            public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Article> articles = response.body().getArticles();
+                    articleList.clear();
+                    articleList.addAll(articles);
+                    articleAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(MainActivity.this, "Błąd podczas ładowania danych", Toast.LENGTH_SHORT).show();
+                }
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onFailure(Call<NewsResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Błąd połączenia z serwerem", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Ustaw domyślne zaznaczenie na "Home"
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
     }
 
     private void refreshArticles() {
-        new Handler().postDelayed(() -> {
-            // Simulate fetching new articles
-            articleList.add(0, new Article("New Title " + articleList.size(), "New Author", "New Content", "https://example.com/new_image.jpg"));
-            articleAdapter.notifyDataSetChanged();
-            swipeRefreshLayout.setRefreshing(false); // Stop the refreshing animation
-        }, 2000); // Delay to simulate loading time
+        // Pobierz nowe artykuły z API, wywołując loadArticles()
+        loadArticles();
     }
 }
